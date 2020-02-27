@@ -12,9 +12,9 @@ The files are:
 
 * 01_kallisto_scATAC_clustering.Rmd: this contains the analysis performed with Seurat (R commands)
 
-## Required commands to obtain count matrix for scATAC-seq with Kallisto-bustools
+## Kallisto-bustools command for scATAC-seq
 
-### Kallisto index for scATAC-seq
+#### Kallisto index for scATAC-seq
 
 ```
 kallisto index –i Dnase.idx –k 31 Dnase.fa --make-unique  
