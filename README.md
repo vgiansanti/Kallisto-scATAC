@@ -8,10 +8,5 @@ The files are:
 
 * .... : this notebook contains the analysis performed with Scanpy (python commands)
 
-* : this file contains the analysis performed with Seurat (R commands)
+* 01_kallisto_scATAC_clustering.Rmd: this contains the analysis performed with Seurat (R commands)
 
-* quello R
-
-* quello python
- 
-3- indicazioni per fare indice
