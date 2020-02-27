@@ -8,7 +8,7 @@ The data used in the analysis are the one provided by the 10x Genomics public da
 
 The files are:
 
-* Kallisto_scATAC.ipynb : this notebook contains the analysis performed with Scanpy (python commands)
+* Kallisto_scATAC.ipynb: this notebook contains the analysis performed with Scanpy (python commands)
 
 * 01_kallisto_scATAC_clustering.Rmd: this contains the analysis performed with Seurat (R commands)
 
