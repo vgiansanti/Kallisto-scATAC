@@ -15,7 +15,9 @@ The files are:
 ## Kallisto-bustools command for scATAC-seq
 
 Here are reported the commands to build a count matrix for scATAC-seq data with Kallisto.
-The *_kallisto_* index can be obtained from any collection of annotated peaks in fasta format.
+The **_kallisto index_** can be obtained from any collection of annotated peaks in fasta format.
+**_kallisto bus_** for ATAC requires to modify the fastq files. 
+To completely understand how these steps are performed, please see the Mehods section of the paper.
 
 ##### Generate a Kallisto index
 
@@ -26,7 +28,7 @@ kallisto index –i Dnase.idx –k 31 Dnase.fa --make-unique
 ##### Run Kallisto
 ```
 kallisto bus –t 8 –i Dnase.idx –o bus_output/ -x 0,0,16:0,16,26:1,0,0 –t 4 
-atac_v1_pbmc_10k_S1_L001_R2_001_mod.fastq atac_v1_pbmc_10k_S1_L001_R1_001.fastq 
+atac_pbmc_10k_R2.fastq atac_pbmc_10k_R1.fastq 
 ```
 
 #### Build the count matrix
