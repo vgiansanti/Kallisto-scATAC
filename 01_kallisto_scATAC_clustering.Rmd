@@ -1,0 +1,198 @@
+---
+title: "kallisto_scATAC"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(Seurat)
+library(Matrix)
+library(here)
+library(tidyverse)
+here()
+
+cellranger_peaks <- Read10X_h5(filename = "data/atac_cellranger/atac_v1_pbmc_10k_filtered_peak_bc_matrix.h5")
+
+kallisto_500bp_dhs_peaks<- readMM("data/atac_kallisto/counts.hg19.dhs.merged500bp.mtx")
+
+# the sparse matrix with rows are cells and columns are peaks/features
+kallisto_500bp_dhs_peaks<- t(kallisto_500bp_dhs_peaks)
+regions<- read_tsv("data/atac_kallisto/hg19.dhs.merged500bp.names.txt", col_names = FALSE)
+cells<- read_tsv("data/atac_kallisto/whitelist.txt", col_names = FALSE)
+
+rownames(kallisto_500bp_dhs_peaks)<- regions$X1
+## cellranger put -1 for each cell barcode, add this to kallisto cell names
+colnames(kallisto_500bp_dhs_peaks)<- paste0(cells$X1, "-1")
+kallisto_500bp_dhs_peaks[1:5, 1:5]
+        
+# create a gene activity matrix from the peak matrix and GTF, using chromosomes 1:22, X, and Y. Peaks that fall within gene bodies, or 2kb upstream of a gene, are considered
+## this is the 2kb + genebody ATAC counts, later will be used for label transfering from the scRNAseq data
+
+# takes ~1 hour 11mins
+kallisto.activity.matrix.genebody <- CreateGeneActivityMatrix(peak.matrix = kallisto_500bp_dhs_peaks, annotation.file = "data/Homo_sapiens.GRCh37.75.gtf", seq.levels = c(1:22,"X","Y"), upstream = 2000, verbose = TRUE)
+
+cellranger.activity.matrix.genebody <- CreateGeneActivityMatrix(peak.matrix = cellranger_peaks, annotation.file = "data/Homo_sapiens.GRCh37.75.gtf", seq.levels = c(1:22,"X","Y"), upstream = 2000, verbose = TRUE)
+
+cellranger.pbmc.atac<- CreateSeuratObject(counts = cellranger_peaks, assay = 'ATAC', project = 'cellranger')
+
+kallisto.pbmc.atac<- CreateSeuratObject(counts = kallisto_500bp_dhs_peaks, assay = 'ATAC', project = 'kallisto')
+
+VlnPlot(pbmc.atac, features = c("nCount_ATAC", "nFeature_ATAC") )
+```
+
+
+### add the genebody activity score into the seurat RNA slot and run TF-IDF and SVD 
+
+Note, if one changes the parameters, the total number of clusters can change
+
+```{r}
+library(dplyr)
+
+ProcessSeuratActivity<- function(seurat.atac, activity.matrix){
+        seurat.atac[['RNA']] <- CreateAssayObject(counts = activity.matrix)
+        seurat.atac <- subset(x = seurat.atac, subset = nCount_ATAC > 5000)
+        seurat.atac$tech <- "atac"
+        # process the activity data
+        DefaultAssay(object =seurat.atac) <- 'RNA'
+        seurat.atac <- FindVariableFeatures(object = seurat.atac, nfeatures = 5000) %>%
+                NormalizeData() %>%
+                ScaleData()
+        ## preprocess ATAC
+        DefaultAssay(object = seurat.atac) <- "ATAC"
+        VariableFeatures(object = seurat.atac) <- names(x = which(x = Matrix::rowSums(x = seurat.atac) > 100))
+        seurat.atac <- RunLSI(object = seurat.atac, n = 50, scale.max = NULL)
+        seurat.atac <- RunUMAP(seurat.atac, reduction = "lsi", dims = 1:30)
+        seurat.atac<- FindNeighbors(seurat.atac, k.param = 20, reduction = "lsi", dims= 1:30) %>%
+          FindClusters(resolution = 0.3)
+        return(seurat.atac)
+}
+
+
+#devtools::install_github("crazyhottommy/scATACutils")
+
+kallisto.pbmc.atac.genebody<- ProcessSeuratActivity(kallisto.pbmc.atac, activity.matrix = kallisto.activity.matrix.genebody)
+
+cellranger.pbmc.atac.genebody<- ProcessSeuratActivity(cellranger.pbmc.atac, activity.matrix = cellranger.activity.matrix.genebody)
+
+
+p1<- DimPlot(kallisto.pbmc.atac.genebody, label = TRUE) + ggtitle("kallisto")
+p2<- DimPlot(cellranger.pbmc.atac.genebody, label = TRUE) + ggtitle("cellranger")
+
+pdf("results/umap_kallisto_cellranger.pdf", width = 9, height = 6)
+cowplot::plot_grid(p1, p2)
+dev.off()
+
+```
+
+## how similar are the clusters 
+
+```{r}
+library(scclusteval)
+
+pdf("results/kallisto_cellranger_cluster_by_ATAC.pdf", width = 7, height = 6)
+PairWiseJaccardSetsHeatmap(Idents(kallisto.pbmc.atac.genebody), factor(Idents(cellranger.pbmc.atac.genebody), levels = levels(Idents(cellranger.pbmc.atac.genebody))))
+dev.off()
+```
+
+
+### reading in the 10k pbmc scRNAseq data 
+
+This is downloaded from the Seurat website and curated by the Seurat group with cell types assigned based on marker genes.
+
+`curl -L pbmc_10k_v3.rds https://www.dropbox.com/s/3f3p5nxrn5b3y4y/pbmc_10k_v3.rds?dl=1 - o pbmc_10k_v3.rds`
+
+```{r loading.rds}
+pbmc.rna <- readRDS(file = "data/rna_cellranger/pbmc_10k_v3.rds")
+pbmc.rna$tech <- "rna"
+DimPlot(object = pbmc.rna, group.by = "celltype", label = TRUE, repel = TRUE)
+ggsave("results/10k_pbmc_RNAseq_tsne.pdf", width = 8 ,height = 6)
+
+```
+
+Now, we can identify anchors between the scATAC-seq dataset and the scRNA-seq dataset and use these anchors to transfer the celltype labels we learned in the 10K vignette to the scATAC-seq cells. 
+
+```{r transfer}
+
+transferLabels<- function(reference, query){
+        transfer.anchors <- FindTransferAnchors(
+                reference = reference,
+                query = query,
+                features = VariableFeatures(object = reference),
+                reference.assay = 'RNA',
+                query.assay = 'RNA',
+                reduction = 'cca')
+        # Transfer cluster IDs
+        # pbmc.rna$celltype (input) contains a vector of previously annotated cell type labels for the          RNA.
+        # celltype.predictions (output) will contain a matrix with predictions and confidence scores for         each ATAC-seq cell!
+        celltype.predictions <- TransferData(
+                anchorset = transfer.anchors,
+                refdata = reference$celltype,
+                weight.reduction = query[['lsi']])
+        query <- AddMetaData(object = query, metadata = celltype.predictions)
+        
+}
+
+
+kallisto.pbmc.atac.genebody<- transferLabels(reference = pbmc.rna, query = kallisto.pbmc.atac.genebody)
+cellranger.pbmc.atac.genebody<- transferLabels(reference = pbmc.rna, query = cellranger.pbmc.atac.genebody)
+
+
+kallisto.pbmc.atac.genebody@meta.data$predicted.id %>% table()
+cellranger.pbmc.atac.genebody@meta.data$predicted.id %>% table()
+
+library(scclusteval)
+Idents(cellranger.pbmc.atac.genebody)<- cellranger.pbmc.atac.genebody@meta.data$predicted.id
+Idents(kallisto.pbmc.atac.genebody)<- kallisto.pbmc.atac.genebody@meta.data$predicted.id
+
+pdf("results/transferred_label_cell.pdf", width = 7, height = 6)
+PairWiseJaccardSetsHeatmap(Idents(kallisto.pbmc.atac.genebody), factor(Idents(cellranger.pbmc.atac.genebody), levels = levels(Idents(kallisto.pbmc.atac.genebody))))
+dev.off()
+```
+
+### histogram of the prediction scores
+
+```{r}
+
+q1<- kallisto.pbmc.atac.genebody$prediction.score.max %>% tibble::enframe() %>% 
+  ggplot(aes(x= value)) +
+  geom_histogram(col = "white") +
+  theme_light(base_size = 14) +
+  xlab("max prediction score") +
+  ggtitle("kallisto") +
+  coord_cartesian (xlim = c(0.2,1))
+
+
+q2<- cellranger.pbmc.atac.genebody$prediction.score.max %>% tibble::enframe() %>% 
+  ggplot(aes(x= value)) +
+  geom_histogram(col = "white") +
+  theme_light(base_size = 14) +
+  xlab("max prediction score") + 
+  ggtitle("cellranger") +
+  coord_cartesian (xlim = c(0.2,1))
+
+cowplot::plot_grid(q1, q2)
+ggsave("results/pbmc_prediction_score.pdf", width = 8, height = 5)
+```
+### plot scRNAseq and scATACseq umap side by side
+
+```{r}
+library(ggplot2)
+
+
+DefaultAssay(object = kallisto.pbmc.atac.genebody) <- "ATAC"
+p4 <-  DimPlot(kallisto.pbmc.atac.genebody, group.by = "predicted.id", label = TRUE, repel = TRUE) + ggtitle("kallisto ATAC") + 
+    NoLegend() + scale_colour_hue(drop = FALSE)
+
+DefaultAssay(object = cellranger.pbmc.atac.genebody) <- "ATAC"
+p5 <-  DimPlot(cellranger.pbmc.atac.genebody, group.by = "predicted.id", label = TRUE, repel = TRUE) + ggtitle("cellranger ATAC") + 
+    NoLegend() + scale_colour_hue(drop = FALSE)
+
+p6 <- DimPlot(pbmc.rna, group.by = "celltype", label = TRUE, repel = TRUE) + NoLegend() + ggtitle("scRNA-seq")
+CombinePlots(plots = list(p4, p5, p6), ncol = 3)
+
+ggsave("results/pbmc_scATAC_scRNAseq_umap.pdf", width = 12, height = 6)
+
+
+```
+
