@@ -4,6 +4,8 @@ This folder contains all the command and scripts to reprocude the analysis of sc
 
 ## Data
 
+The data used in the analysis are the one provided by the 10x Genomics public datasets (https://support.10xgenomics.com/single-cell-atac/datasets/1.1.0/atac_v1_pbmc_10k)
+
 The files are:
 
 * .... : this notebook contains the analysis performed with Scanpy (python commands)
