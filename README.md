@@ -1,6 +1,6 @@
 # Kallisto-scATAC
 
-Ciao a tutti mi chiamo Valentina Giansanti e i file sono questi:
+This folder contains all the command and scripts to reprocude the analysis of scATAC-seq data with Kallisto-bustools.
 
 * quello R
 
