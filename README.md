@@ -12,3 +12,9 @@ The files are:
 
 * 01_kallisto_scATAC_clustering.Rmd: this contains the analysis performed with Seurat (R commands)
 
+## Kallisto-bustolls on scATAC-seq
+
+```
+kallisto index
+
+```
