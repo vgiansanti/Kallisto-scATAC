@@ -14,18 +14,18 @@ The files are:
 
 ## Kallisto-bustools command for scATAC-seq
 
-#### Kallisto index for scATAC-seq
+##### Generate a Kallisto index
 
 ```
 kallisto index –i Dnase.idx –k 31 Dnase.fa --make-unique  
 ```
 
-### Run Kallisto
+##### Run Kallisto
 ```
 kallisto bus –t 8 –i Dnase.idx –o bus_output/ -x 0,0,16:0,16,26:1,0,0 –t 4 atac_v1_pbmc_10k_S1_L001_R2_001_mod.fastq atac_v1_pbmc_10k_S1_L001_R1_001.fastq 
 ```
 
-### Build the count matrix
+#### Build the count matrix
 ```
 bustools correct –w ../whitelist_correct.txt –p output.bus | bustools sort –T tmp/ -t 4 –p -| bustools count –o genecount/genes –g ../transcript_to_genes.txt –e matrix.ec –t transcripts.txt --genecounts -
 ```
