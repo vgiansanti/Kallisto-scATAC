@@ -56,20 +56,29 @@ You can find the list of all maps used in the paper in this repository.
 We described in the paper several options to run kallisto with scATAC-seq data. If `n` is the number of nucleotides used for simulate the UMI, the command to pseudoalign in the *forward* configuration would be:
 
 ```bash
-$ kallisto bus -t 8 -i ${peaks}.idx -o ${peaks}_${n}_fwd -x 1,0,16:2,0,${n}:0,0,0 pbmc_10k_R1.fastq.gz pbmc_10k_R2.fastq.gz pbmc_10k_R3.fastq.gz
+$ kallisto bus -t 8 -i ${peaks}.idx -o ${peaks}_${n}_fwd -x 1,0,16:2,0,${n}:0,0,0 \
+pbmc_10k_R1.fastq.gz \
+pbmc_10k_R2.fastq.gz \
+pbmc_10k_R3.fastq.gz
 ```
 
 and the command for the *reverse* configuration (with better results) is:
 
 ```bash
-$ kallisto bus -t 8 -i ${peaks}.idx -o ${peaks}_${n}_rev -x 1,0,16:2,0,${n}:0,0,0 pbmc_10k_R3.fastq.gz pbmc_10k_R2.fastq.gz pbmc_10k_R1.fastq.gz
+$ kallisto bus -t 8 -i ${peaks}.idx -o ${peaks}_${n}_rev -x 1,0,16:2,0,${n}:0,0,0 \
+pbmc_10k_R3.fastq.gz \
+pbmc_10k_R2.fastq.gz \
+pbmc_10k_R1.fastq.gz
 ```
 
 Once kallisto has finished, the count matrix can be generated like this:
 
 ```bash
 $ cd ${kallisto_output}
-$ bustools correct -w whitelist.txt -p output.bus | bustools sort -T tmp -t 4 -p - | bustools count -o counts/${prefix} -g ${peaks}.map.txt -e matrix.ec -t ${peaks}.names.txt --genecounts  -
+$ bustools correct -w whitelist.txt -p output.bus | \
+bustools sort -T tmp -t 4 -p - | \
+bustools count -o counts/${prefix} -g ${peaks}.map.txt \
+-e matrix.ec -t ${peaks}.names.txt --genecounts  -
 ```
 
 where `$prefix` is the prefix for the resulting files (`${prefix}.genes.txt`, `${prefix}.barcodes.txt` and `${prefix}.mtx`). Remember to adjust the paths of `whitelist.txt`, `${peaks}.map.txt` and `${peaks}.names.txt` according to your system.
