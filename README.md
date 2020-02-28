@@ -13,7 +13,7 @@ The files needed for the analysis are:
 * Peaks (BED)
 * Clustering analysis (to retrieve the whitelist file)
 
-In addition, a fasta file for hg19 genome is also needed, it can be retrieved from [UCSC genome browser](http://hgdownload.cse.ucsc.edu/goldenpath/hg19/bigZips/hg19.fa.gz). DNAseI Hypersensitive Sites can also be retreieved from UCSC genome brwoser, use the Table Browser tool to retrieve, in BED format, the table `wgEncodeRegDnaseClusteredV3` (under Mammal -> Human -> hg19 -> Regulation -> DNase Clusters).
+In addition, a fasta file for hg19 genome is also needed, it can be retrieved from [UCSC genome browser](http://hgdownload.cse.ucsc.edu/goldenpath/hg19/bigZips/hg19.fa.gz). DNAseI Hypersensitive Sites can be retrieved from the appropriate [ENCODE file](http://big.databio.org/papers/RED/supplement/dhs112_v3.bed.gz). As an alternative, DNAseI Hypersensitive Sites can also be retreieved from UCSC genome brwoser, use the Table Browser tool to retrieve, in BED format, the table `wgEncodeRegDnaseClusteredV3` (under Mammal -> Human -> hg19 -> Regulation -> DNase Clusters). 
 
 ## Building a kallisto index for ATAC analysis
 
@@ -27,7 +27,7 @@ $ kallisto index -i ${peaks}.idx ${peaks}.fa
 In order to produce the `DHS500` index, we just merged the DHS data as follows:
 
 ```bash
-$ bedtools sort -i wgEncodeRegDnaseClusteredV3.bed | bedtools merge -d 500 > DHS500.bed
+$ bedtools sort -i ${DHS_sites}.bed | bedtools merge -d 500 > DHS500.bed
 ```
 
 and indexed it as described above. 
