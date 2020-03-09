@@ -15,6 +15,8 @@ The files needed for the analysis are:
 
 In addition, a fasta file for hg19 genome is also needed, it can be retrieved from [UCSC genome browser](http://hgdownload.cse.ucsc.edu/goldenpath/hg19/bigZips/hg19.fa.gz). DNase I Hypersensitive Sites can be retrieved from the appropriate [ENCODE file](http://big.databio.org/papers/RED/supplement/dhs112_v3.bed.gz). As an alternative, DNase I Hypersensitive Sites can also be retreieved from UCSC genome browser: use the Table Browser tool to retrieve, in BED format, the table `wgEncodeRegDnaseClusteredV3` (under Mammal -> Human -> hg19 -> Regulation -> DNase Clusters). 
 
+We provide, in this repository, the bed files and the name maps used in the paper, both for DHS approach and the DHS500 approach, under the folder [reference](https://github.com/vgiansanti/Kallisto-scATAC/tree/master/reference)
+
 ## Building a kallisto index for ATAC analysis
 
 In order to build an index, one needs to extract DNA sequence for a peak list. This can be done using [bedtools](https://github.com/arq5x/bedtools2) or any other suitable tool. Once bed files and genome fasta files are in place, just issue the following command, assuming that `peaks` is the prefix for bed files:
