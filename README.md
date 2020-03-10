@@ -93,6 +93,6 @@ Their output files can be now analyzed with your preferred tool. Here you can fi
 
 The other files available are:
 
-* MI_evaluation.ipynb: the observation of MI variation can be reproduced by running this notebook.
+* Figure1C_MI_evaluation.ipynb: the observation of MI variation can be reproduced by running this notebook.
 
 * Figure2_Circular_staked_barplot.R: is the script to make the bar plot of the paper. 
