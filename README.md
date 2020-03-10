@@ -85,9 +85,10 @@ bustools count -o counts/${prefix} -g ${peaks}.map.txt \
 
 where `$prefix` is the prefix for the resulting files (`${prefix}.genes.txt`, `${prefix}.barcodes.txt` and `${prefix}.mtx`). Remember to adjust the paths of `whitelist.txt`, `${peaks}.map.txt` and `${peaks}.names.txt` according to your system.
 
-Ther output files can be now analyzed with your preferred tool. Here you can find two example analysis:
+Their output files can be now analyzed with your preferred tool. Here you can find two example analysis:
 
 * Kallisto_scATAC.ipynb: this notebook contains the analysis performed with Scanpy (python commands)
 
 * 01_kallisto_scATAC_clustering.Rmd: this contains the analysis performed with Seurat (R commands)
 
+The observation of MI variation can be reproduced by running the notebook "MI_evaluation.ipynb".
