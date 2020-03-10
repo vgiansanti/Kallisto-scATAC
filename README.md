@@ -91,4 +91,8 @@ Their output files can be now analyzed with your preferred tool. Here you can fi
 
 * 01_kallisto_scATAC_clustering.Rmd: this contains the analysis performed with Seurat (R commands)
 
-The observation of MI variation can be reproduced by running the notebook "MI_evaluation.ipynb".
+The other files available are:
+
+* MI_evaluation.ipynb: the observation of MI variation can be reproduced by running this notebook.
+
+* Circular_staked_barplot.R: is the script to reproduce the bar plot of the paper. 
