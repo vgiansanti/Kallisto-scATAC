@@ -4,7 +4,7 @@ This folder contains the commands and scripts to reproduce the analysis of scATA
 
 ## Data
 
-The data used in the analysis are the one provided by the [10x Genomics public datasets](https://support.10xgenomics.com/single-cell-atac/datasets/1.1.0/atac_v1_pbmc_10k).
+The data used in the analysis of PBMCs are those provided by the [10x Genomics public datasets](https://support.10xgenomics.com/single-cell-atac/datasets/1.1.0/atac_v1_pbmc_10k).
 
 The files needed for the analysis are:
 
@@ -17,7 +17,7 @@ In addition, a fasta file for hg19 genome is also needed, it can be retrieved fr
 
 We provide, in this repository, the bed files and the name maps used in the paper, both for DHS approach and the DHS500 approach, under the folder [reference](https://github.com/vgiansanti/Kallisto-scATAC/tree/master/reference).
 
-The [K562_data](https://github.com/vgiansanti/Kallisto-scATAC/tree/master/K562_data) folder contains intead the count matrices in h5ad format of the cell line analyzed. There is also the whitelist used to convert cellular barcodes to SRR accession numbers. 
+The [K562_data](https://github.com/vgiansanti/Kallisto-scATAC/tree/master/K562_data) folder contains intead the count matrices in h5ad format of the K562 cell line analyzed. There is also the whitelist used to convert cellular barcodes to SRR accession numbers. 
 
 ## Building a kallisto index for ATAC analysis
 
@@ -89,15 +89,15 @@ where `$prefix` is the prefix for the resulting files (`${prefix}.genes.txt`, `$
 
 Their output files can be now analyzed with your preferred tool. Here you can find two example analysis:
 
-* Kallisto_scATAC.ipynb: this notebook contains the analysis performed with Scanpy (python commands)
+* Kallisto_scATAC.ipynb: this notebook contains the analysis performed on PBMCs data with Scanpy (python commands)
 
-* 01_kallisto_scATAC_clustering.Rmd: this contains the analysis performed with Seurat (R commands)
+* 01_kallisto_scATAC_clustering.Rmd: this contains the analysis performed on PBMCs data with Seurat (R commands)
 
 The other files available are:
 
 * Analysis_of_K562_cells.ipynb: the notebook with the analysis performed on the K562 cell line. The count matrices and the whitelist are the ones in the [K562_data](https://github.com/vgiansanti/Kallisto-scATAC/tree/master/K562_data) folder.
 
-* Figure1C_MI_evaluation.ipynb: the observation of MI variation can be reproduced by running this notebook.
+* Figure1C_MI_evaluation.ipynb: the observation of MI variation on PBMCs data can be reproduced by running this notebook.
 
 * Figure2_Circular_staked_barplot.R: is the script to make the bar plot of the paper. 
 
