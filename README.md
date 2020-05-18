@@ -17,7 +17,7 @@ In addition, a fasta file for hg19 genome is also needed, it can be retrieved fr
 
 We provide, in this repository, the bed files and the name maps used in the paper, both for DHS approach and the DHS500 approach, under the folder [reference](https://github.com/vgiansanti/Kallisto-scATAC/tree/master/reference).
 
-The [K562_data] folder contains intead the count matrices in h5ad format of the cell line analyzed. 
+The [K562_data](https://github.com/vgiansanti/Kallisto-scATAC/tree/master/K562_data) folder contains intead the count matrices in h5ad format of the cell line analyzed. 
 
 ## Building a kallisto index for ATAC analysis
 
@@ -95,7 +95,7 @@ Their output files can be now analyzed with your preferred tool. Here you can fi
 
 The other files available are:
 
-* Analysis_of_K562_cells.ipynb: the notebook with the analysis performed on the K562 cell line. The count matrices are the ones in the [K562_data] folder.
+* Analysis_of_K562_cells.ipynb: the notebook with the analysis performed on the K562 cell line. The count matrices are the ones in the [K562_data](https://github.com/vgiansanti/Kallisto-scATAC/tree/master/K562_data) folder.
 
 * Figure1C_MI_evaluation.ipynb: the observation of MI variation can be reproduced by running this notebook.
 
