@@ -17,6 +17,8 @@ In addition, a fasta file for hg19 genome is also needed, it can be retrieved fr
 
 We provide, in this repository, the bed files and the name maps used in the paper, both for DHS approach and the DHS500 approach, under the folder [reference](https://github.com/vgiansanti/Kallisto-scATAC/tree/master/reference).
 
+The [K562_data] folder contains intead the count matrices in h5ad format of the cell line analyzed. 
+
 ## Building a kallisto index for ATAC analysis
 
 In order to build an index, one needs to extract DNA sequence for a peak list. This can be done using [bedtools](https://github.com/arq5x/bedtools2) or any other suitable tool. Once bed files and genome fasta files are in place, just issue the following command, assuming that `peaks` is the prefix for bed files:
@@ -92,6 +94,8 @@ Their output files can be now analyzed with your preferred tool. Here you can fi
 * 01_kallisto_scATAC_clustering.Rmd: this contains the analysis performed with Seurat (R commands)
 
 The other files available are:
+
+* Analysis_of_K562_cells.ipynb: the notebook with the analysis performed on the K562 cell line. The count matrices are the ones in the [K562_data] folder.
 
 * Figure1C_MI_evaluation.ipynb: the observation of MI variation can be reproduced by running this notebook.
 
