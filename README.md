@@ -4,7 +4,7 @@ This folder contains the commands and scripts to reproduce the analysis of scATA
 
 ## Data
 
-The data used in the analysis of PBMCs are those provided by the [10x Genomics public datasets](https://support.10xgenomics.com/single-cell-atac/datasets/1.1.0/atac_v1_pbmc_10k).
+The PBMCs data used in the analysis are the one provided by the [10x Genomics public datasets](https://support.10xgenomics.com/single-cell-atac/datasets/1.1.0/atac_v1_pbmc_10k).
 
 The files needed for the analysis are:
 
